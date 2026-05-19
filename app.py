@@ -5,7 +5,20 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 # 1. 구글 시트 연동 설정 (API 인증 키 필요)
 # scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-# creds = ServiceAccountCredentials.from_json_keyfile_name('secret.json', scope)
+import streamlit as st
+import json
+
+# ... (init_connection 함수 내용 수정)
+@st.cache_resource
+def init_connection():
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+    
+    # [수정] 깃허브 보안을 위해 Streamlit Secrets에서 정보를 가져옴
+    creds_dict = st.secrets["gcp_service_account"]
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+    
+    client = gspread.authorize(creds)
+    return client
 # client = gspread.authorize(creds)
 
 st.title("프리미엄 차량 케어 가맹점 발주 시스템")
